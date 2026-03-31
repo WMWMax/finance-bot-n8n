@@ -1,0 +1,1839 @@
+{
+  "name": "AI Multimodal Expense Tracker_Final_v2.2",
+  "nodes": [
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ '🗑 Удалить запись?\\n\\n<b>Описание:</b> ' + $json.confirm_delete?.description + '\\n<b>Сумма:</b> ' + $json.confirm_delete?.value + '\\n<b>Дата:</b> ' + $json.confirm_delete?.date }}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "✅ Да, удалить",
+                    "additionalFields": {
+                      "callback_data": "={{ 'confirm_delete:' + $json.confirm_delete?.record_id }}"
+                    }
+                  },
+                  {
+                    "text": "❌ Отмена",
+                    "additionalFields": {
+                      "callback_data": "cancel_delete"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        5808,
+        2688
+      ],
+      "id": "d0f86fbb-507e-47e0-8623-ed9f65e53215",
+      "name": "Подтверждение удаления",
+      "webhookId": "9b986b7e-466a-4be8-8248-37d5af911ed8",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "MoneyTracker"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0ce32339-a04e-44a4-8eee-3ff699353b00",
+                    "leftValue": "={{ $('Триггер Telegram').item.json.message.text }}",
+                    "rightValue": "/start",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "/start"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "2d5b2f97-1f8f-48d9-8c81-515e77996efe",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $('Триггер Telegram').item.json.message.text }}",
+                    "rightValue": ""
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "2d880d6b-56c3-4daa-b4ec-3a72d397b41b",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $('Триггер Telegram').item.json.message.voice }}",
+                    "rightValue": ""
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Voice"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e54d943e-e6ca-498d-954f-2701e33dfa66",
+                    "leftValue": "={{ $('Триггер Telegram').item.json.callback_query?.data }}",
+                    "rightValue": "confirm_delete",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Confirm Delete"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "70780a39-f195-4217-833e-9bb325437caf",
+                    "leftValue": "={{ $('Триггер Telegram').item.json.callback_query?.data }}",
+                    "rightValue": "cancel_delete",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Cancel Delete"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "49a57800-ba85-442c-a75b-de831a4a6d1c",
+                    "leftValue": "={{ $('Триггер Telegram').item.json.message.text }}",
+                    "rightValue": "💰 Баланс",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Buttons"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b9bc81f7-d5bb-4fc0-a462-b9faec47a5f6",
+                    "leftValue": "={{ $('Триггер Telegram').item.json.message.text }}",
+                    "rightValue": "📊 Отчёт",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Buttons"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "18c28319-b1fe-4a37-9a13-3149193665f6",
+                    "leftValue": "={{ $('Триггер Telegram').item.json.message.text }}",
+                    "rightValue": "📋 История",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Buttons"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "81828da8-e2f5-44a8-bf9a-6d1b3469d7a6",
+                    "leftValue": "={{ $('Триггер Telegram').item.json.message.text }}",
+                    "rightValue": "🎯 Цели",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Buttons"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "309fd55e-8576-4045-9a24-7c77d408e792",
+      "name": "Маршрутизатор",
+      "type": "n8n-nodes-base.switch",
+      "position": [
+        3168,
+        2736
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Триггер Telegram').item.json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "id": "75ed0bde-982f-4c60-a220-13a8cf30b66a",
+      "name": "Получение голосового файла",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        3664,
+        2864
+      ],
+      "webhookId": "e3f61732-60a5-4116-8350-18f853286b1d",
+      "typeVersion": 1.2,
+      "retryOnFail": false,
+      "notesInFlow": false,
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "MoneyTracker"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Триггер Telegram').item.json.message.from.id }}",
+        "text": "=⚠️ Извини! Я пока не умею обрабатывать картинки и видео.  \nПожалуйста, отправь мне текст или голосовое сообщение.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "25d586f5-e5c7-4f8a-aee3-e34626f4e638",
+      "name": "Сообщение о неподдерживаемом типе",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        3536,
+        3552
+      ],
+      "webhookId": "54a95e4f-38b0-4992-a5c1-81791dba21ab",
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "MoneyTracker"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.output || $items()[0].json.output }}",
+        "replyMarkup": "replyKeyboard",
+        "replyKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "💰 Баланс",
+                    "additionalFields": {}
+                  },
+                  {
+                    "text": "📊 Отчёт",
+                    "additionalFields": {}
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "📋 История",
+                    "additionalFields": {}
+                  },
+                  {
+                    "text": "🎯 Цели",
+                    "additionalFields": {}
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "replyKeyboardOptions": {
+          "resize_keyboard": true
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "9cb1da22-fed4-4d9a-a0a9-5621a17ab185",
+      "name": "Отправка ответа",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        6096,
+        2912
+      ],
+      "webhookId": "54a95e4f-38b0-4992-a5c1-81791dba21ab",
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "MoneyTracker"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "id": "8a81e703-22f7-413a-b815-a5d69a5fa783",
+      "name": "Триггер Telegram",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "position": [
+        2720,
+        2768
+      ],
+      "webhookId": "3fb3235c-eaa7-421e-a3d2-90cc42e88f1e",
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "MoneyTracker"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        3904,
+        2896
+      ],
+      "id": "3b824232-7015-4ffd-8279-70a5c397a565",
+      "name": "Транскрипция голоса",
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAi account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        4368,
+        3232
+      ],
+      "id": "794da4a9-fd7f-4223-9bf9-7f236f220627",
+      "name": "Модель GPT-4o",
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendChatAction",
+        "chatId": "={{ $('Триггер Telegram').item.json.message?.chat?.id ?? $('Триггер Telegram').item.json.callback_query?.message?.chat?.id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2928,
+        2768
+      ],
+      "id": "17217e1b-abd9-4445-ba67-7f8e669e30f7",
+      "name": "Индикатор печатает",
+      "webhookId": "73e905c1-ab7d-468a-9324-e561654c9167",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "MoneyTracker"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "34a9718f-2113-40c5-856c-ccb8b44dfeb7",
+              "name": "text",
+              "value": "=👋 Привет! Я твой финансовый помощник.\n\nЗаписываю доходы и расходы, считаю баланс и делаю отчёты — прямо в Telegram.\n\n<b>Как записывать:</b>\nПросто пиши что произошло с деньгами:\n<code>потратил 500 на еду</code>\n<code>получил зарплату 80000</code>\n<code>такси 350 по карте</code>\n\n<b>Финансовые цели:</b>\n<code>хочу откладывать 20000 в месяц</code>\n<code>накопить подушку безопасности 3 зарплаты</code>\nЯ буду сравнивать твои расходы с целью и давать советы.\n\n<b>Стартовый баланс (по желанию):</b>\n<code>зафиксируй что у меня сейчас 85000</code>\n\nИспользуй кнопки ниже или просто пиши 👇",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3456,
+        2464
+      ],
+      "id": "d0488e8e-33fb-46ba-9ba4-0bd135c07462",
+      "name": "Текст приветствия"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Триггер Telegram').item.json.message.from.id }}",
+        "text": "={{ $json.text }}",
+        "replyMarkup": "replyKeyboard",
+        "replyKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "💰 Баланс",
+                    "additionalFields": {}
+                  },
+                  {
+                    "text": "📊 Отчёт",
+                    "additionalFields": {}
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "📋 История",
+                    "additionalFields": {}
+                  },
+                  {
+                    "text": "🎯 Цели",
+                    "additionalFields": {}
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "replyKeyboardOptions": {
+          "resize_keyboard": true
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "a5ff539f-a7e8-4142-bb36-6b8ee22d5613",
+      "name": "Отправка приветствия",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        3680,
+        2464
+      ],
+      "webhookId": "54a95e4f-38b0-4992-a5c1-81791dba21ab",
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "MoneyTracker"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "=ВАЖНО: Никогда не включай в ответ служебную информацию об инструментах. Начинай ответ сразу с HTML результата.\nSYSTEM RULE #1 — АБСОЛЮТНЫЙ ЗАПРЕТ:\nТвой ответ должен начинаться СРАЗУ с результата.\nПервый символ ответа = \"<\" (HTML тег) или эмодзи.\nЕсли первый символ не \"<\" и не эмодзи — ты нарушил правило.\nНикогда не пиши: [Used tools], Tool:, Input:, Result:, get_all_registers, create_new_register и любые названия инструментов.\nТы — финансовый помощник в Telegram. Отвечай только на русском, только в Telegram HTML (<b>, <i>, <code>, <pre>). Без Markdown. Максимум 3 эмодзи.\n\nUSER_ID = {{ $('Триггер Telegram').item.json.message?.from?.id ?? $('Триггер Telegram').item.json.callback_query?.from?.id }}\nTODAY = {{ $now.toISODate() }}\n\nИНСТРУМЕНТЫ: create_new_register, get_all_registers, update_register, delete_register\nНикогда не упоминай инструменты в ответе.\n\n---\n\nЗАПИСЬ ОПЕРАЦИИ\nАБСОЛЮТНОЕ ПРАВИЛО: Ты НИКОГДА не отвечаешь на финансовые операции без вызова инструментов.\nЕсли сообщение содержит трату или доход — СНАЧАЛА вызови create_new_register, ПОТОМ отвечай.\nБез вызова инструмента — ответ запрещён.\nЕсли сообщение содержит трату или доход — вызови create_new_register с полями:\n- user_id = USER_ID\n- type = \"expense\" | \"income\"\n- value = число\n- category = по смыслу (Food, Transport, Salary и т.д.)\n- payment_method = из текста или \"cash\"\n- description = кратко\n- date = TODAY\n\nПосле записи ответь шаблоном:\n<b>✅ Записано!</b>\n<b>Тип:</b> <code>{type}</code>\n<b>Сумма:</b> <code>{value}</code>\n<b>Категория:</b> <code>{category}</code>\n<b>Оплата:</b> <code>{payment_method}</code>\n<b>Дата:</b> <code>{date}</code>\n<b>Описание:</b> {description}\n\n---\n\nАНАЛИТИКА / БАЛАНС / ИСТОРИЯ\n1. Вызови get_all_registers\n2. Отфильтруй по user_id\n3. Посчитай и ответь в HTML\n\n---\n\nРЕДАКТИРОВАНИЕ / УДАЛЕНИЕ\n1. Вызови get_all_registers\n2. Отфильтруй по user_id\n3. Покажи запись пользователю\n4. Жди подтверждения \"да\" / \"удали\"\n5. Только потом выполни действие\n\nУДАЛЕНИЕ\nКогда пользователь хочет удалить запись:\n1. Вызови get_all_registers\n2. Отфильтруй по user_id\n3. Найди нужную запись\n4. Верни СТРОГО ТОЛЬКО этот JSON и НИЧЕГО БОЛЬШЕ - никакого текста до или после:\n{\"action\":\"confirm_delete\",\"record_id\":\"{id}\",\"description\":\"{description}\",\"value\":\"{value}\",\"date\":\"{date}\"}\nЗАПРЕЩЕНО добавлять любой текст к этому JSON.\nЗАПРЕЩЕНО просить подтверждения текстом.\nТОЛЬКО JSON.\n\n---\n\nСТАРТОВЫЙ БАЛАНС\nЕсли пишет \"у меня сейчас X\" или \"зафиксируй баланс X\":\ncreate_new_register с type=\"income\", category=\"Starting balance\", description=\"Стартовый баланс\"\n\n---\n\nЦЕЛИ\nКогда пользователь нажимает \"goals\" или пишет про цели:\n1. Вызови get_all_registers\n2. Отфильтруй записи где category = \"Goal\" или description содержит \"цель\"\n3. Если целей нет — предложи создать: \"хочу откладывать 20000 в месяц\"\n4. Если цели есть — покажи прогресс: сколько накоплено vs цель\n5. При создании цели — вызови create_new_register с type=\"income\", category=\"Goal\"\n\nПример ответа:\n<b>🎯 Твои цели</b>\n<b>Подушка безопасности:</b> <code>50000 / 150000</code>\nПрогресс: 33%\n\n---\n\nОШИБКИ\nЕсли что-то пошло не так — напиши: \"⚠️ Не удалось выполнить. Попробуй ещё раз.\"\nНикаких технических деталей."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        4624,
+        2784
+      ],
+      "id": "1c8dcbfa-091a-49e1-9a17-ae4137e41e85",
+      "name": "ИИ Агент",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9eeab3fa-c267-48ad-8c8b-2001fab9a8a3",
+              "name": "chat_id",
+              "value": "={{ $('Триггер Telegram').item.json.message.from.id }}",
+              "type": "string"
+            },
+            {
+              "id": "358975c3-9145-4ab4-a428-fb62d0925c75",
+              "name": "text",
+              "value": "={{ $('Триггер Telegram').item.json.message?.text ?? $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4256,
+        2768
+      ],
+      "id": "b37fc74b-5185-4411-acd7-03caaf8d1b95",
+      "name": "Установка Chat ID"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "48f754d9-1447-49b6-9b0e-da058bafcb39",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "fdf9683e-5c1b-41be-8b60-ca00586c67ab",
+              "name": "chat_id",
+              "value": "={{ $('Установка Chat ID').isExecuted ? $('Установка Chat ID').item.json.chat_id : $('Установка данных кнопки').isExecuted ? $('Установка данных кнопки').item.json.chat_id : $('Триггер Telegram').item.json.message?.chat?.id }}",
+              "type": "string"
+            },
+            {
+              "id": "dff2b852-89e7-494e-a355-a5be971aa226",
+              "name": "confirm_delete",
+              "value": "={{ $json.confirm_delete }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5296,
+        2784
+      ],
+      "id": "26fd7bdf-a0b3-4d94-9026-6fcac686829a",
+      "name": "Сборка ответа"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Триггер Telegram').item.json.message.from.id }}",
+        "text": "⚠️ Не удалось получить голосовое сообщение. Попробуй ещё раз.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3856,
+        3088
+      ],
+      "id": "7dce158d-2cab-4143-82d2-9cc5f9d790b3",
+      "name": "Ошибка получения файла",
+      "webhookId": "3fdf9822-dde2-4f8e-874b-7506bb1268d5",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "MoneyTracker"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Триггер Telegram').item.json.message.from.id }}",
+        "text": "⚠️ Не удалось распознать голос. Попробуй написать текстом.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        4112,
+        2992
+      ],
+      "id": "5e0fbaf3-aa83-4087-8c50-5cadd457ab1b",
+      "name": "Ошибка транскрипции",
+      "webhookId": "d0a7a2b6-d923-4903-a1ac-37dec8119bde",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "MoneyTracker"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Триггер Telegram').item.json.message?.from?.id ?? $('Триггер Telegram').item.json.callback_query?.from?.id }}",
+        "text": "⚠️ Что-то пошло не так. Попробуй ещё раз или напиши /start",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        5264,
+        2976
+      ],
+      "id": "47d6d4aa-4b81-420f-b513-9f2275c01b36",
+      "name": "Ошибка ИИ Агента",
+      "webhookId": "b0350158-4a4c-49a7-9609-dc5de43a1a18",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "MoneyTracker"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c91458c2-9b8c-4515-86ff-1bb7c03578ff",
+              "name": "chat_id",
+              "value": "={ $('Триггер Telegram').item.json.message.from.id }}",
+              "type": "string"
+            },
+            {
+              "id": "c8cb9efd-a066-4e36-bf7f-aba2deb9f1e8",
+              "name": "text",
+              "value": "={{ $('Триггер Telegram').item.json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4080,
+        3296
+      ],
+      "id": "630704a3-297e-4eb4-acd8-6acbb0c21777",
+      "name": "Установка данных кнопки"
+    },
+    {
+      "parameters": {
+        "resource": "callback",
+        "queryId": "={{ $('Триггер Telegram').item.json.callback_query.id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3680,
+        3392
+      ],
+      "id": "55a49de2-4207-4ade-af1a-3813d05972e9",
+      "name": "Ответ на callback",
+      "webhookId": "6963cdf4-f00d-4889-b3cb-4fcb1faca410",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "MoneyTracker"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $input.item.json.output || '';\n\n// Чистим [Used tools]\nconst cleaned = text.replace(/\\[Used tools:.*?\\]\\s*/gs, '').trim();\n\n// Проверяем флаг удаления\nlet confirmDelete = null;\ntry {\n  const parsed = JSON.parse(cleaned);\n  if (parsed.action === 'confirm_delete') {\n    confirmDelete = parsed; // уже объект\n  }\n} catch (e) {}\n\nreturn {\n  json: {\n    ...$input.item.json,\n    output: confirmDelete ? '' : cleaned,\n    confirm_delete: confirmDelete // объект, не строка\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5040,
+        2784
+      ],
+      "id": "5ff47708-d941-45f6-ad6e-e097d66966ba",
+      "name": "Очистка ответа"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "84d5a4c4-9223-4c91-8477-a7c1d29bb84a",
+              "leftValue": "={{ $json.confirm_delete }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        5504,
+        2784
+      ],
+      "id": "200797e1-4a78-4903-80e9-eaca7ad8af09",
+      "name": "Проверка удаления"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Триггер Telegram').item.json.callback_query?.data }}",
+                    "rightValue": "confirm_delete",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    },
+                    "id": "6c36bdce-ca8b-4076-8e44-30471e81d137"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Confirm Delete"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "aa49a45d-caef-40b1-b179-b07799ac8174",
+                    "leftValue": "={{ $('Триггер Telegram').item.json.callback_query?.data }}",
+                    "rightValue": "cancel_delete",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Cancel Delete"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        4000,
+        3488
+      ],
+      "id": "13d0a0d9-c7f0-4d2f-88e7-644a9308c511",
+      "name": "Маршрутизатор удаления"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Триггер Telegram').item.json.callback_query.from.id }}",
+        "text": "❌ Удаление отменено",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        4304,
+        3584
+      ],
+      "id": "fd8e9c9e-eb7f-43a8-8c91-41a50ca73964",
+      "name": "Отмена удаления",
+      "webhookId": "f03858ba-fed2-4404-ae4e-8c0b7b2370e5",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "MoneyTracker"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Personal Finance",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "id",
+              "lookupValue": "={{ $('Триггер Telegram').item.json.callback_query.data.split(':')[1] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4528,
+        3360
+      ],
+      "id": "983bdcee-6dda-486c-8426-94cfca92e515",
+      "name": "Найти строку для удаления",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Personal Finance",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"
+        },
+        "startIndex": "={{ $json.row_number }}"
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4800,
+        3376
+      ],
+      "id": "2826f6a1-c036-4ce9-8548-b1bc90b0f6dd",
+      "name": "Выполнение удаления",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Триггер Telegram').item.json.callback_query.from.id }}",
+        "text": "✅ Запись удалена",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        5088,
+        3392
+      ],
+      "id": "83a037d1-a320-425b-9e02-44ecb200ea1d",
+      "name": "Удаление выполнено",
+      "webhookId": "8db9af97-5c99-4192-b8cc-94c596984a46",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "MoneyTracker"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Delete one or more financial records from Google Sheets.",
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Personal Finance",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"
+        },
+        "startIndex": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start_Row_Number', ``, 'number') }}",
+        "numberToDelete": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Number_of_Rows_to_Delete', ``, 'number') }}"
+      },
+      "id": "525b0e0b-6e97-4397-8047-d5cd7e3216dc",
+      "name": "delete_register",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "position": [
+        5312,
+        3232
+      ],
+      "typeVersion": 4.6,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get all financial records from Google Sheets. Use this tool before answering any question about finances.",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Personal Finance",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "1d60d513-f69a-455b-b1ec-afe23729e5d4",
+      "name": "get_all_registers",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "position": [
+        4976,
+        3248
+      ],
+      "typeVersion": 4.6,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Update an existing financial record in Google Sheets using its id.",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Personal Finance",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id__using_to_match_', ``, 'string') }}",
+            "type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('type', ``, 'string') }}",
+            "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('value', ``, 'string') }}",
+            "category": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('category', ``, 'string') }}",
+            "payment_method": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('payment_method', ``, 'string') }}",
+            "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('description', ``, 'string') }}",
+            "date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('date', ``, 'string') }}",
+            "user_id": "={{ $('Триггер Telegram').item.json.message?.from?.id ?? $('Триггер Telegram').item.json.callback_query?.from?.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "value",
+              "displayName": "value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "payment_method",
+              "displayName": "payment_method",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "6cdd6385-3ff6-4761-8984-ef893602bf2e",
+      "name": "update_register",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "position": [
+        4832,
+        3232
+      ],
+      "typeVersion": 4.6,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Create a new financial record (income or expense) in Google Sheets.",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Personal Finance",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $now.toMillis() }}",
+            "user_id": "={{ $('Триггер Telegram').item.json.message?.from?.id ?? $('Триггер Telegram').item.json.callback_query?.from?.id }}",
+            "type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('type', ``, 'string') }}",
+            "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('value', ``, 'string') }}",
+            "category": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('category', ``, 'string') }}",
+            "payment_method": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('payment_method', ``, 'string') }}",
+            "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('description', ``, 'string') }}",
+            "date": "={{ $now.toISODate() }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "value",
+              "displayName": "value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "payment_method",
+              "displayName": "payment_method",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ok",
+              "displayName": "ok",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "result",
+              "displayName": "result",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "text",
+              "displayName": "text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "toolCallId",
+              "displayName": "toolCallId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "RAW"
+        }
+      },
+      "id": "d9f25047-f746-49bc-bd31-db5930cb625c",
+      "name": "create_new_register",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "position": [
+        5152,
+        3232
+      ],
+      "typeVersion": 4.6,
+      "notesInFlow": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "f157d9f8-6b77-4c28-b140-745870a279aa",
+      "name": "Calculator",
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "position": [
+        4688,
+        3232
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ \"user_\" + String($('Триггер Telegram').item.json.message?.chat?.id ?? $('Триггер Telegram').item.json.callback_query?.message?.chat?.id) }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        4544,
+        3168
+      ],
+      "id": "fa115911-d073-49f7-9108-2bf49b0f693f",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "YOUR_POSTGRES_CREDENTIAL_ID",
+          "name": "Postgres account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Маршрутизатор": {
+      "main": [
+        [
+          {
+            "node": "Текст приветствия",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Установка Chat ID",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Получение голосового файла",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ответ на callback",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ответ на callback",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Установка данных кнопки",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Установка данных кнопки",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Установка данных кнопки",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Установка данных кнопки",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Сообщение о неподдерживаемом типе",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Получение голосового файла": {
+      "main": [
+        [
+          {
+            "node": "Транскрипция голоса",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ошибка получения файла",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Сообщение о неподдерживаемом типе": {
+      "main": [
+        []
+      ]
+    },
+    "Триггер Telegram": {
+      "main": [
+        [
+          {
+            "node": "Индикатор печатает",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Транскрипция голоса": {
+      "main": [
+        [
+          {
+            "node": "Установка Chat ID",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ошибка транскрипции",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Модель GPT-4o": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "ИИ Агент",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Индикатор печатает": {
+      "main": [
+        [
+          {
+            "node": "Маршрутизатор",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Текст приветствия": {
+      "main": [
+        [
+          {
+            "node": "Отправка приветствия",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ИИ Агент": {
+      "main": [
+        [
+          {
+            "node": "Очистка ответа",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ошибка ИИ Агента",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Установка Chat ID": {
+      "main": [
+        [
+          {
+            "node": "ИИ Агент",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Сборка ответа": {
+      "main": [
+        [
+          {
+            "node": "Проверка удаления",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Установка данных кнопки": {
+      "main": [
+        [
+          {
+            "node": "ИИ Агент",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ на callback": {
+      "main": [
+        [
+          {
+            "node": "Маршрутизатор удаления",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Очистка ответа": {
+      "main": [
+        [
+          {
+            "node": "Сборка ответа",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Проверка удаления": {
+      "main": [
+        [
+          {
+            "node": "Подтверждение удаления",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Отправка ответа",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Маршрутизатор удаления": {
+      "main": [
+        [
+          {
+            "node": "Найти строку для удаления",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Отмена удаления",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Найти строку для удаления": {
+      "main": [
+        [
+          {
+            "node": "Выполнение удаления",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Выполнение удаления": {
+      "main": [
+        [
+          {
+            "node": "Удаление выполнено",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "delete_register": {
+      "ai_tool": [
+        [
+          {
+            "node": "ИИ Агент",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_all_registers": {
+      "ai_tool": [
+        [
+          {
+            "node": "ИИ Агент",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update_register": {
+      "ai_tool": [
+        [
+          {
+            "node": "ИИ Агент",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create_new_register": {
+      "ai_tool": [
+        [
+          {
+            "node": "ИИ Агент",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "ИИ Агент",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "ИИ Агент",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "YOUR_VERSION_ID",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "YOUR_INSTANCE_ID"
+  },
+  "id": "YOUR_WORKFLOW_ID",
+  "tags": [
+    {
+      "updatedAt": "2026-02-14T16:07:02.694Z",
+      "createdAt": "2026-02-14T16:07:02.694Z",
+      "id": "YOUR_TAG_ID",
+      "name": "Template"
+    }
+  ]
+}
